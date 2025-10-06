@@ -15,14 +15,11 @@ datasource db {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  name       String
-  username   String   @unique
-  email      String   @unique
-  password   String
-  isAdmin    Boolean  @default(false)
-  created_at DateTime @default(now())
-  isActive   Boolean  @default(true)
+  id         Int        @id @default(autoincrement())
+  name       String     @default("anonymous")
+  isActive   Boolean    @default(true)
+  Gameplay   Gameplay[]
+  created_at DateTime   @default(now())
 }
 
 model Session {
@@ -30,4 +27,45 @@ model Session {
   sid       String   @unique
   data      String
   expiresAt DateTime
+}
+
+model Character {
+  id         Int        @id @default(autoincrement())
+  name       String
+  position_x Int
+  position_y Int
+  isActive   Boolean    @default(true)
+  Gameplay   Gameplay[]
+  created_at DateTime   @default(now())
+
+  @@unique([position_x, position_y])
+}
+
+model Move {
+  id         Int      @id @default(autoincrement())
+  position_x Int
+  position_y Int
+  GamePlay   Gameplay @relation(fields: [gameplayId], references: [id])
+  gameplayId Int
+  created_at DateTime @default(now())
+}
+
+model Gameplay {
+  id          Int         @id @default(autoincrement())
+  Character   Character   @relation(fields: [characterId], references: [id])
+  characterId Int
+  result      Boolean
+  User        User        @relation(fields: [userId], references: [id])
+  userId      Int
+  Move        Move[]
+  Gameresult  Gameresult?
+  created_at  DateTime    @default(now())
+}
+
+model Gameresult {
+  id          Int       @id @default(autoincrement())
+  Gameplay    Gameplay  @relation(fields: [gameplayId], references: [id])
+  gameplayId  Int       @unique
+  finished_at DateTime?
+  created_at  DateTime  @default(now())
 }
