@@ -30,42 +30,45 @@ model Session {
 }
 
 model Character {
-  id         Int        @id @default(autoincrement())
+  id         Int          @id @default(autoincrement())
   name       String
   position_x Int
   position_y Int
-  isActive   Boolean    @default(true)
-  Gameplay   Gameplay[]
-  created_at DateTime   @default(now())
+  isActive   Boolean      @default(true)
+  created_at DateTime     @default(now())
+  Gamerecord Gamerecord[]
 
   @@unique([position_x, position_y])
 }
 
 model Move {
-  id         Int      @id @default(autoincrement())
-  position_x Int
-  position_y Int
-  GamePlay   Gameplay @relation(fields: [gameplayId], references: [id])
-  gameplayId Int
-  created_at DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  position_x  Int
+  position_y  Int
+  GamePlay    Gameplay @relation(fields: [gameplayId], references: [id])
+  gameplayId  Int
+  marker      Boolean?
+  characterId Int
+  created_at  DateTime @default(now())
 }
 
 model Gameplay {
-  id          Int         @id @default(autoincrement())
-  Character   Character   @relation(fields: [characterId], references: [id])
-  characterId Int
-  result      Boolean
-  User        User        @relation(fields: [userId], references: [id])
+  id          Int          @id @default(autoincrement())
+  status      String       @default("playing")
+  User        User         @relation(fields: [userId], references: [id])
   userId      Int
   Move        Move[]
-  Gameresult  Gameresult?
-  created_at  DateTime    @default(now())
+  created_at  DateTime     @default(now())
+  Gamerecord  Gamerecord[]
+  finished_at DateTime?
 }
 
-model Gameresult {
+model Gamerecord {
   id          Int       @id @default(autoincrement())
-  Gameplay    Gameplay  @relation(fields: [gameplayId], references: [id])
-  gameplayId  Int       @unique
-  finished_at DateTime?
+  Character   Character @relation(fields: [characterId], references: [id])
+  characterId Int
+  result      Boolean   @default(false)
   created_at  DateTime  @default(now())
+  Gameplay    Gameplay  @relation(fields: [gameplayId], references: [id])
+  gameplayId  Int
 }
