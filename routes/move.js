@@ -2,7 +2,7 @@ const { Router } = require("express");
 const { param, validationResult } = require("express-validator");
 const passport = require("passport");
 
-const userController = require("../controllers/userController");
+const moveController = require("../controllers/moveController");
 
 const router = Router();
 
@@ -20,18 +20,18 @@ const sendValidationResults = (req, res, next) => {
 
 router.use(
   "/:id",
-  param("id").isNumeric().withMessage("User Id should be a number"),
+  param("id").isNumeric().withMessage("Character Id should be a number"),
   sendValidationResults
 );
 
-router.post("/", userController.createUser);
+router.post("/", moveController.createMove);
 
-router.get("/:id", userController.getUser);
+router.get("/:id", moveController.getMove);
 
-router.put("/:id", userController.updateUser);
+// router.put("/:id", moveController.updateMove);
 
-router.delete("/:id", userController.deleteUser);
+// router.delete("/:id", moveController.deleteMove);
 
-router.get("/", userController.getAllUser);
+router.get("/", moveController.getMoves);
 
 module.exports = router;

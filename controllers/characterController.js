@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 const jwt = require("jsonwebtoken");
 
-async function getUser(req, res) {
+async function getCharacter(req, res) {
   const user = await prisma.user.findFirst({
     where: {
       id: Number(req.params.id),
@@ -14,30 +14,35 @@ async function getUser(req, res) {
   return res.json({ user });
 }
 
-async function getAllUser(req, res) {
-  const users = await prisma.user.findMany({
+async function getCharacters(req, res) {
+  const characters = await prisma.character.findMany({
     where: {
       isActive: true,
     },
-    orderBy: {
-      created_at: "desc",
-    },
   });
 
-  return res.json({ users });
+  return res.json(characters);
 }
 
-async function createUser(req, res, next) {
+async function createCharacter(req, res, next) {
   try {
-    const User = await prisma.user.create({});
+    const character = {
+      name: req.body.name,
+      position_x: Number(req.body.position_x),
+      position_y: Number(req.body.position_y),
+    };
 
-    return res.json(User);
+    const Character = await prisma.character.create({
+      data: character,
+    });
+
+    return res.json(Character);
   } catch (err) {
     next(err);
   }
 }
 
-async function updateUser(req, res, next) {
+async function updateCharacter(req, res, next) {
   try {
     req.params.id = parseInt(req.params.id);
 
@@ -66,7 +71,7 @@ async function updateUser(req, res, next) {
   }
 }
 
-async function deleteUser(req, res, next) {
+async function deleteCharacter(req, res, next) {
   const id = Number(req.params.id);
 
   const user = await prisma.user.update({
@@ -87,9 +92,9 @@ async function deleteUser(req, res, next) {
 }
 
 module.exports = {
-  getUser,
-  getAllUser,
-  createUser,
-  updateUser,
-  deleteUser,
+  getCharacter,
+  getCharacters,
+  createCharacter,
+  updateCharacter,
+  deleteCharacter,
 };
