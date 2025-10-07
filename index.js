@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -51,6 +52,10 @@ app.use((req, res, next) => {
 app.use("/session", routes.session);
 app.use("/users", routes.user);
 app.use("/messages", routes.message);
+app.use("/characters", routes.character);
+app.use("/gameplays", routes.gameplay);
+app.use("/gamerecords", routes.gamerecord);
+app.use("/moves", routes.move);
 app.use("/auth", authRoutes);
 
 app.use((err, req, res, next) => {
