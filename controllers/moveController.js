@@ -55,13 +55,8 @@ async function createMove(req, res, next) {
       characterId: Number(req.body.characterId),
       gameplayId: Number(req.body.gameplayId),
     };
-   
 
     const range = Number(req.body.range) / 2;
-    // const x = Number(req.body.position_x);
-    // const y = Number(req.body.position_y);
-    // const characterId = Number(req.body.characterId);
-    // const gameplayId = Number(req.body.gameplayId);
 
     const characters = await prisma.character.findMany({
       select: {
@@ -73,21 +68,34 @@ async function createMove(req, res, next) {
 
     const matchedCharacter = checkRightMove(move, characters, range);
 
-    // const matchCharacter = characters.filter(
-    //   (character) =>
-    //     character.id === characterId &&
-    //     character.position_x === x &&
-    //     character.position_y === y
-    // );
-
-    // move = {
-    //   position_x: x,
-    //   position_y: y,
-    //   characterId: characterId,
-    //   gameplayId: gameplayId,
-    // };
-
     if (matchedCharacter) {
+      const gamerecord = await prisma.gamerecord.findFirst({
+        select: {
+          id: true,
+        },
+        where: {
+          gameplayId: move.gameplayId,
+          AND: {
+            characterId: move.characterId,
+          },
+        },
+      });
+
+      const UpdatedGamerecord = await prisma.gamerecord.update({
+        where: {
+          id: gamerecord.id,
+          AND: {
+            gameplayId: move.gameplayId,
+            AND: {
+              characterId: move.characterId,
+            },
+          },
+        },
+        data: {
+          result: true,
+        },
+      });
+
       move.marker = true;
     } else {
       move.marker = false;
