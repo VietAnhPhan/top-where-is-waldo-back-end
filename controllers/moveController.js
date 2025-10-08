@@ -15,7 +15,28 @@ async function getMove(req, res) {
 }
 
 async function getMoves(req, res) {
-  const moves = await prisma.move.findMany();
+  const queryString = req.query;
+  let moves = [];
+
+  if (queryString.gameplayId && queryString.userId && queryString.gameplayId !=="" && queryString.userId !=="") {
+    moves = await prisma.move.findMany({
+      where: {
+        gameplayId: Number(queryString.gameplayId),
+        AND: {
+          GamePlay: {
+            userId: Number(queryString.userId),
+          },
+        },
+      },
+      include: {
+        GamePlay: {
+          select: {
+            userId: true,
+          },
+        },
+      },
+    });
+  } else moves = await prisma.move.findMany();
 
   return res.json(moves);
 }

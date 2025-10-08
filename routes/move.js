@@ -32,6 +32,6 @@ router.get("/:id", moveController.getMove);
 
 // router.delete("/:id", moveController.deleteMove);
 
-router.get("/", moveController.getMoves);
+router.get("{gameplayId=:gameplayId&userId=:userId}", moveController.getMoves);
 
 module.exports = router;
