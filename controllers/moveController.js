@@ -56,6 +56,19 @@ async function createMove(req, res, next) {
       gameplayId: Number(req.body.gameplayId),
     };
 
+    const remainCharacters = await prisma.gamerecord.findMany({
+      where: {
+        gameplayId: move.gameplayId,
+        AND: {
+          result: false,
+        },
+      },
+    });
+
+    if (remainCharacters.length == 0) {
+      return res.json(null);
+    }
+
     const range = Number(req.body.range) / 2;
 
     const characters = await prisma.character.findMany({
