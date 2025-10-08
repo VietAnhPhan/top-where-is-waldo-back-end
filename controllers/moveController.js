@@ -3,6 +3,7 @@ const { PrismaClient } = require("../generated/prisma");
 const prisma = new PrismaClient();
 
 const jwt = require("jsonwebtoken");
+const checkRightMove = require("../config/helpers");
 
 async function getMove(req, res) {
   const Move = await prisma.move.findFirst({
@@ -18,7 +19,12 @@ async function getMoves(req, res) {
   const queryString = req.query;
   let moves = [];
 
-  if (queryString.gameplayId && queryString.userId && queryString.gameplayId !=="" && queryString.userId !=="") {
+  if (
+    queryString.gameplayId &&
+    queryString.userId &&
+    queryString.gameplayId !== "" &&
+    queryString.userId !== ""
+  ) {
     moves = await prisma.move.findMany({
       where: {
         gameplayId: Number(queryString.gameplayId),
@@ -43,11 +49,19 @@ async function getMoves(req, res) {
 
 async function createMove(req, res, next) {
   try {
-    let move = {};
-    const x = Number(req.body.position_x);
-    const y = Number(req.body.position_y);
-    const characterId = Number(req.body.characterId);
-    const gameplayId = Number(req.body.gameplayId);
+    let move = {
+      position_x: Number(req.body.position_x),
+      position_y: Number(req.body.position_y),
+      characterId: Number(req.body.characterId),
+      gameplayId: Number(req.body.gameplayId),
+    };
+   
+
+    const range = Number(req.body.range) / 2;
+    // const x = Number(req.body.position_x);
+    // const y = Number(req.body.position_y);
+    // const characterId = Number(req.body.characterId);
+    // const gameplayId = Number(req.body.gameplayId);
 
     const characters = await prisma.character.findMany({
       select: {
@@ -57,21 +71,23 @@ async function createMove(req, res, next) {
       },
     });
 
-    const matchCharacter = characters.filter(
-      (character) =>
-        character.id === characterId &&
-        character.position_x === x &&
-        character.position_y === y
-    );
+    const matchedCharacter = checkRightMove(move, characters, range);
 
-    move = {
-      position_x: x,
-      position_y: y,
-      characterId: characterId,
-      gameplayId: gameplayId,
-    };
+    // const matchCharacter = characters.filter(
+    //   (character) =>
+    //     character.id === characterId &&
+    //     character.position_x === x &&
+    //     character.position_y === y
+    // );
 
-    if (matchCharacter.length > 0) {
+    // move = {
+    //   position_x: x,
+    //   position_y: y,
+    //   characterId: characterId,
+    //   gameplayId: gameplayId,
+    // };
+
+    if (matchedCharacter) {
       move.marker = true;
     } else {
       move.marker = false;
