@@ -61,6 +61,7 @@ model Gameplay {
   created_at  DateTime     @default(now())
   Gamerecord  Gamerecord[]
   finished_at DateTime?
+  isFinished  Boolean      @default(false)
 }
 
 model Gamerecord {
