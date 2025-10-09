@@ -49,25 +49,14 @@ async function getMoves(req, res) {
 
 async function createMove(req, res, next) {
   try {
+
+    
     let move = {
       position_x: Number(req.body.position_x),
       position_y: Number(req.body.position_y),
       characterId: Number(req.body.characterId),
       gameplayId: Number(req.body.gameplayId),
     };
-
-    const remainCharacters = await prisma.gamerecord.findMany({
-      where: {
-        gameplayId: move.gameplayId,
-        AND: {
-          result: false,
-        },
-      },
-    });
-
-    if (remainCharacters.length == 0) {
-      return res.json(null);
-    }
 
     const range = Number(req.body.range) / 2;
 
@@ -118,7 +107,32 @@ async function createMove(req, res, next) {
       data: move,
     });
 
-    return res.json(Move);
+    const remainCharacters = await prisma.gamerecord.findMany({
+      where: {
+        gameplayId: move.gameplayId,
+        AND: {
+          result: false,
+        },
+      },
+    });
+
+    if (remainCharacters.length == 0) {
+      try {
+        await prisma.gameplay.update({
+          where: {
+            id: move.gameplayId,
+          },
+          data: {
+            isFinished: true,
+          },
+        });
+      } catch (err) {
+        next(err);
+      }
+      return res.json({ Move, isFinished: true });
+    }
+
+    return res.json({ Move, isFinished: false });
   } catch (err) {
     next(err);
   }
