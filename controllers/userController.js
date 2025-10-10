@@ -15,16 +15,39 @@ async function getUser(req, res) {
 }
 
 async function getAllUser(req, res) {
-  const users = await prisma.user.findMany({
-    where: {
-      isActive: true,
-    },
-    orderBy: {
-      created_at: "desc",
-    },
-  });
+  const queryString = req.query;
+  let users = [];
 
-  return res.json({ users });
+  if (
+    queryString.gameplay &&
+    queryString.gameplayfinished &&
+    queryString.gameplay == "true" &&
+    queryString.gameplayfinished == "true"
+  ) {
+    users = await prisma.gameplay.findMany({
+      where: {
+        isFinished: true,
+        AND: {
+          finished_at: {
+            not: null,
+          },
+        },
+      },
+      include: {
+        User: true,
+      },
+    });
+  } else
+    users = await prisma.user.findMany({
+      where: {
+        isActive: true,
+      },
+      orderBy: {
+        created_at: "desc",
+      },
+    });
+
+  return res.json(users);
 }
 
 async function createUser(req, res, next) {
