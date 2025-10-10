@@ -49,8 +49,19 @@ async function getMoves(req, res) {
 
 async function createMove(req, res, next) {
   try {
+    const finishedGameplay = await prisma.gameplay.findFirst({
+      where: {
+        id: Number(req.body.gameplayId),
+        AND: {
+          isFinished: true,
+        },
+      },
+    });
 
-    
+    if (finishedGameplay && finishedGameplay.isFinished) {
+      return res.json(null);
+    }
+
     let move = {
       position_x: Number(req.body.position_x),
       position_y: Number(req.body.position_y),
@@ -123,16 +134,17 @@ async function createMove(req, res, next) {
             id: move.gameplayId,
           },
           data: {
+            status: "finished",
+            finished_at: new Date(),
             isFinished: true,
           },
         });
       } catch (err) {
         next(err);
       }
-      return res.json({ Move, isFinished: true });
     }
 
-    return res.json({ Move, isFinished: false });
+    return res.json(Move);
   } catch (err) {
     next(err);
   }
