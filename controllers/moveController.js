@@ -29,8 +29,11 @@ async function getMoves(req, res) {
       where: {
         gameplayId: Number(queryString.gameplayId),
         AND: {
-          GamePlay: {
-            userId: Number(queryString.userId),
+          isActive: true,
+          AND: {
+            GamePlay: {
+              userId: Number(queryString.userId),
+            },
           },
         },
       },
