@@ -37,6 +37,20 @@ async function createGameplay(req, res, next) {
 
     // console.log(gameplay);
     // return;
+
+    const lastGameplay = await prisma.gameplay.findFirst({
+      where: {
+        userId: Number(req.body.userId),
+      },
+      orderBy: {
+        id: "desc",
+      },
+    });
+
+    if (!lastGameplay.isFinished && !lastGameplay.finished_at) {
+      return res.json(null);
+    }
+
     const Gameplay = await prisma.gameplay.create({
       data: { userId: Number(req.body.userId) },
     });
