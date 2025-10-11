@@ -62,28 +62,22 @@ async function createUser(req, res, next) {
 
 async function updateUser(req, res, next) {
   try {
-    req.params.id = parseInt(req.params.id);
+    const id = parseInt(req.params.id);
+    const name = req.body.name;
 
-    let user = {};
-    for (const [key, value] of Object.entries(req.body)) {
-      if (key === "password") {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        user.password = hashedPassword;
-      } else if (value === "") {
-        continue;
-      } else {
-        user[key] = value;
-      }
-    }
+    let user = {
+      id,
+      name,
+    };
 
-    await prisma.user.update({
+    const User = await prisma.user.update({
       where: {
-        id: req.params.id,
+        id: id,
       },
       data: user,
     });
 
-    return res.json({ user });
+    return res.json(User);
   } catch (err) {
     next(err);
   }
