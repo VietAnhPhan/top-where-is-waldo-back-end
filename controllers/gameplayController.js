@@ -47,7 +47,7 @@ async function createGameplay(req, res, next) {
       },
     });
 
-    if (!lastGameplay.isFinished && !lastGameplay.finished_at) {
+    if (lastGameplay && !lastGameplay.isFinished && !lastGameplay.finished_at) {
       return res.json(null);
     }
 
